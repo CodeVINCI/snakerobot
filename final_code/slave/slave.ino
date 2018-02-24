@@ -19,6 +19,8 @@
 
 int x1,y1,z1,x2,y2,z2;
 
+int s8_err = 12;
+
 Servo s1;
 Servo s2;
 Servo s3;
@@ -41,7 +43,7 @@ int m8=6;
 int m9=8;
 
 
-int arr[13];
+int arr[14];
 
 int buzzer = 11;
 
@@ -116,6 +118,16 @@ void buzz_end(int button)
     noTone(buzzer);
   }
 }
+
+void detection_buzzer()
+{
+  tone(buzzer,3000);
+  delay(500);
+  noTone(buzzer);
+  delay(1000);
+  tone(buzzer,3000);
+  delay(500);
+  }
 
 //================attach detach motor functions===============
 /*
@@ -236,7 +248,7 @@ void snake_straight() {
   s5.write(90);
   s6.write(90);
   s7.write(90);
-  s8.write(90);
+  s8.write(90 + s8_err);
   s9.write(90);  
 }
 
@@ -263,10 +275,10 @@ void catterpillar_turn(int x1)
     {
       attach_x1_motor();
       x1 = (x1*0.5)+45;
-      s2.write(180-x1);
+      s2.write(x1);
       s4.write(x1);
       s6.write(x1);
-      s8.write(180-x1);
+      s8.write(180-x1 + s8_err);
     }
 }
 
@@ -388,7 +400,7 @@ void sidewinding(int x1)
             s2.write(90+25);
             s4.write(90+25);
             s6.write(90+25);
-            s8.write(90-25);
+            s8.write(90-25+ s8_err);
             delay(300);
 
             s5.write(90-30);
@@ -397,7 +409,7 @@ void sidewinding(int x1)
             s2.write(90-25);
             s4.write(90-25);
             s6.write(90-25);
-            s8.write(90+25);
+            s8.write(90+25+ s8_err);
             delay(300);
             }
            
@@ -412,13 +424,18 @@ void sidewinding(int x1)
 
 void loop() {
   
-  for(int val=0;val<13;val++)
+  for(int val=0;val<14;val++)
   {
       Serial.print(arr[val]);
       Serial.println(" ");
     }
   Serial.println("===========================================");
   //delay(1000);  //to see vals uncomment
+
+  if(arr[13])
+  {
+    detection_buzzer();
+    }
 
   buzz_start(arr[4]); //press 4th button to start buzzer
   buzz_end(arr[6]);   //press 6th button to start buzzer
@@ -465,7 +482,7 @@ void loop() {
 void receiveEvent(int howMany) {
   while (1 <= Wire.available()) { // loop through all but the last
     
-    for(int val=0;val<13;val++)
+    for(int val=0;val<14;val++)
     {
       arr[val] = Wire.read();
     }
