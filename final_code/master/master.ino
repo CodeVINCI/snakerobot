@@ -58,8 +58,8 @@ void setup() {
  * Function Name: rgb()
  * Input: None
  * Output: None
- * Logic: ---
- * Example Call: ---
+ * Logic: takes input from the rgb sensor and shows appropriate output in rgb leds. 
+ * Example Call: to be called when triggered with detection button, i.e: rgb().
  */
 void rgb()
 {
@@ -148,8 +148,10 @@ void loop() {
     
   }
 
+if(joystick_val[2])
+{
   rgb();
-
+}
   
 }
 
