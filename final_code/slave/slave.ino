@@ -4,7 +4,7 @@
  * Filename: slave.ino
  * Theme: Spotter Snake
  * Functions: setup(), buzz_start(), buzz_end(), attach_motor(), detach_motor(), 
- *            detach_y1_motor(), attach_y1_motor(), detach_x1_motor(), attach_x1_motor()
+ *            detach_y1_motor(), attach_y1_motor(), detach_x1_motor(), attach_x1_motor() detection_buzzer()
  * Global Variables: x1,x2,y1,y2,z1,z2(values of jouysticks)
  *                   s1,s2,s3,s4,s5,s6,s7,s8,s9(servo motors)
  *                   m1,m2,m3,m4,m5,m6,m7,m8,m9(digital pins of motors)
@@ -119,6 +119,14 @@ void buzz_end(int button)
   }
 }
 
+
+/*
+ * Function Name: detection_buzzer()
+ * Input: Input coming from button,value is either 1 or 0
+ * Logic: If button is pressed buzzer beeps for 
+ *        1/2 seconds 2 time with interval of 1second with frequency of 3000Hz
+ * Example Call: detection_buzzer(arr[PIN])
+ */
 void detection_buzzer()
 {
   tone(buzzer,3000);
