@@ -120,6 +120,7 @@ else if(val_blue < val_green && val_blue < val_red)
     //Serial.print(" , ");
     analogWrite(bluePin,val_blue);
     //Serial.println(val_blue);
+    delay(2000);
   }
 
 
