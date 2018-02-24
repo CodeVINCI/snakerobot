@@ -138,7 +138,7 @@ void loop() {
     int joystick_val[14];  //14th position value for detection_buzzer
     
     radio.read(&joystick_val, sizeof(joystick_val));
-    joystick_val[14] = detection_buzz;
+    joystick_val[13] = detection_buzz;
     for(int i=0;i<14;i++)
     {
       Serial.println(joystick_val[i]);
