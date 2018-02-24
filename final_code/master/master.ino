@@ -7,6 +7,7 @@
  * Global Variables: redPin, greenPin, bluePin(LED Pins)
  *                    s2,s3,outpin(Sensor Pins)
  *                    pulseWidth, val_red,val_blue,val_green
+ *                    
  */
 
 #include <SPI.h>
@@ -62,7 +63,7 @@ void setup() {
  * Example Call: to be called when triggered with detection button, i.e: rgb().
  */
 void rgb()
-{
+{ 
   digitalWrite(s2,LOW);
   digitalWrite(s3,LOW);
 
@@ -125,13 +126,20 @@ else if(val_blue < val_green && val_blue < val_red)
 void loop() {
   if (radio.available()) 
   {
+    int detection_buzz = 0;
+
+    if(joystick_val[2])
+   {
+      rgb();
+      detection_buzz = 1;
+    }
 
     //reading nrf
-    int joystick_val[13];
+    int joystick_val[14];  //14th position value for detection_buzzer
     
     radio.read(&joystick_val, sizeof(joystick_val));
-    
-    for(int i=0;i<13;i++)
+    joystick_val[14] = detection_buzz;
+    for(int i=0;i<14;i++)
     {
       Serial.println(joystick_val[i]);
     }
@@ -139,7 +147,7 @@ void loop() {
 
     //I2C
     Wire.beginTransmission(8);
-    for(int i=0;i<13;i++)
+    for(int i=0;i<14;i++)
     {
       Wire.write(joystick_val[i]); 
     }
@@ -147,11 +155,6 @@ void loop() {
     delay(10);
     
   }
-
-if(joystick_val[2])
-{
-  rgb();
-}
   
 }
 
