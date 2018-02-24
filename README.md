@@ -4,7 +4,7 @@
 * Rishav Sharma
 * Md. Zeeshan Qazi
 * Abhishek Chauhan
-* Tanay Agrawal(me ;)
+* Tanay Agrawal
 
 ## About Code and Project
 
