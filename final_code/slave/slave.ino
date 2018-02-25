@@ -51,7 +51,8 @@ void setup() {
   Wire.begin(8);// join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
   Serial.begin(9600);           // start serial for output
-
+  
+  
   //attach servo
   s1.attach(m1);
   s2.attach(m2);
@@ -249,6 +250,7 @@ void attach_x1_motor(){
  */
 void snake_straight() {
   attach_motor();
+  
   s1.write(90);
   s2.write(90);
   s3.write(90);
@@ -319,7 +321,7 @@ void catterpillar_forward(int y1)
         delay(300);
       
         s9.write(90-23-23-15-15);
-        delay(300);
+        delay(400);
         
         s9.write(90-23-15);
         s5.write(90+23+15);
@@ -349,7 +351,7 @@ void catterpillar_forward(int y1)
         delay(300);
         
         snake_straight();
-        delay(100);
+        delay(50);
         //s9.write(110);
       
     }   
@@ -431,7 +433,7 @@ void sidewinding(int x1)
 
 
 void loop() {
-  
+  //delay(1000);
   for(int val=0;val<14;val++)
   {
       Serial.print(arr[val]);
@@ -440,13 +442,13 @@ void loop() {
   Serial.println("===========================================");
   //delay(1000);  //to see vals uncomment
 
-  if(arr[13])
+  /*if(arr[13])
   {
     detection_buzzer();
     }
 
   buzz_start(arr[4]); //press 4th button to start buzzer
-  buzz_end(arr[6]);   //press 6th button to start buzzer
+  buzz_end(arr[6]); */  //press 6th button to start buzzer
   
   x1 = arr[7];    
   y1 = arr[8];
@@ -462,10 +464,12 @@ void loop() {
        {
         snake_straight();
         }
-       catterpillar(x1,y1,z1);
+        else
+        {catterpillar(x1,y1,z1);
+          }
        
-        
-    }
+       //catterpillar(x1,y1,z1);
+       }
     if(arr[0]==1 && arr[5]==0)
       {
 
@@ -473,7 +477,8 @@ void loop() {
        {
         snake_straight();
         } 
-       sidewinding(x1);
+       else
+       {sidewinding(x1);}
        
        
       }
@@ -500,4 +505,6 @@ void receiveEvent(int howMany) {
  
   //int x = Wire.read();    // receive byte as an integer
   //Serial.println(x);         // print the integer
+
+  
 }

@@ -10,7 +10,7 @@
  *                   address(used to describe radio address)
  */
 
-========================================================================
+//========================================================================
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
@@ -99,5 +99,5 @@ void loop() {
     //sending array
     radio.write(&send_arr, sizeof(send_arr));
 
-
+//delay(1000);
 }

@@ -129,14 +129,17 @@ void loop() {
   {
     int detection_buzz = 0;
 
+
+    //reading nrf
+    int joystick_val[14];  //14th position value for detection_buzzer
+    
     if(joystick_val[2])
    {
       rgb();
       detection_buzz = 1;
     }
 
-    //reading nrf
-    int joystick_val[14];  //14th position value for detection_buzzer
+    
     
     radio.read(&joystick_val, sizeof(joystick_val));
     joystick_val[13] = detection_buzz;
