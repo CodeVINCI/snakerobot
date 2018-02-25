@@ -22,6 +22,8 @@ int redPin = 3;
 int greenPin = 9;
 int bluePin = 10;
 
+int flag= -1;
+
 int s2 = 5;
 int s3 = 6;
 
@@ -52,7 +54,8 @@ void setup() {
   pinMode(s2,OUTPUT);
   pinMode(s3,OUTPUT);
   pinMode(outPin,INPUT);
-  
+
+  rgb();
 }
 
 /*
@@ -64,6 +67,8 @@ void setup() {
  */
 void rgb()
 { 
+  if(flag==0||flag==-1)
+  {
   digitalWrite(s2,LOW);
   digitalWrite(s3,LOW);
 
@@ -121,28 +126,28 @@ else if(val_blue < val_green && val_blue < val_red)
     analogWrite(bluePin,val_blue);
     //Serial.println(val_blue);
     delay(2000);
+    analogWrite(redPin,255);
+    //Serial.print(val_red);
+    //Serial.print(" , ");
+    analogWrite(greenPin,255);
+    //Serial.print(val_green);
+    //Serial.print(" , ");
+    analogWrite(bluePin,255);
+    //Serial.println(val_blue);
+    
+  }
+  flag=flag+1;
   }
 
 
 void loop() {
   if (radio.available()) 
   {
-    int detection_buzz = 0;
-
-
     //reading nrf
-    int joystick_val[14];  //14th position value for detection_buzzer
-    
-    if(joystick_val[2])
-   {
-      rgb();
-      detection_buzz = 1;
-    }
+    int joystick_val[14]={0,0,0,0,0,0,0,0,0,0,0,0,0,0};  //14th position value for detection_buzzer
 
-    
-    
     radio.read(&joystick_val, sizeof(joystick_val));
-    joystick_val[13] = detection_buzz;
+   
     for(int i=0;i<14;i++)
     {
       Serial.println(joystick_val[i]);
@@ -157,6 +162,34 @@ void loop() {
     }
     Wire.endTransmission();
     delay(10);
+    
+    
+    int detection_buzz = 0;
+
+
+    
+    
+    if(joystick_val[2])
+   {
+       detection_buzz = 1;
+            //I2C
+             joystick_val[13] = detection_buzz;
+          Wire.beginTransmission(8);
+          for(int i=0;i<14;i++)
+          {
+            Wire.write(joystick_val[i]); 
+          }
+          Wire.endTransmission();
+      rgb();
+    }
+    else
+    {
+      flag =0;
+      }
+
+    
+    
+    
     
   }
   

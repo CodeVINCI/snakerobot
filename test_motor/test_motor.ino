@@ -21,8 +21,9 @@ int m8=6;
 int m9=8;
 
 void setup() {
- 
-  s1.attach(m1);
+
+ s5.attach(m5);
+  /*s1.attach(m1);
   s2.attach(m2);
   s3.attach(m3);
   s4.attach(m4);
@@ -30,13 +31,22 @@ void setup() {
   s6.attach(m6);
   s7.attach(m7);
   s8.attach(m8);
-  s9.attach(m9); 
+  s9.attach(m9); */
 }
 
 
 
 void loop()
 {
+  s5.write(125);
+  delay(400);
+  s5.write(65);
+  delay(400);
+  delay(1000);
+  }
+
+
+/*{
 
   s1.write(125);
   delay(400);
@@ -92,7 +102,7 @@ void loop()
   delay(400);
   delay(1000);
   
-  }
+  }*/
 
 
 /*void loop() {

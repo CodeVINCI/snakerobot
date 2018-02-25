@@ -4,7 +4,7 @@
  * Filename: slave.ino
  * Theme: Spotter Snake
  * Functions: setup(), buzz_start(), buzz_end(), attach_motor(), detach_motor(), 
- *            detach_y1_motor(), attach_y1_motor(), detach_x1_motor(), attach_x1_motor() detection_buzzer()
+ *            detach_y1_motor(), attach_y1_motor(), detach_x1_motor(), attach_x1_motor(), detection_buzzer()
  * Global Variables: x1,x2,y1,y2,z1,z2(values of jouysticks)
  *                   s1,s2,s3,s4,s5,s6,s7,s8,s9(servo motors)
  *                   m1,m2,m3,m4,m5,m6,m7,m8,m9(digital pins of motors)
@@ -43,26 +43,15 @@ int m8=6;
 int m9=8;
 
 
-int arr[14];
+int arr[14]={0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
+int flag = -1;
 int buzzer = 11;
 
 void setup() {
   Wire.begin(8);// join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
   Serial.begin(9600);           // start serial for output
-  
-  
-  //attach servo
-  s1.attach(m1);
-  s2.attach(m2);
-  s3.attach(m3);
-  s4.attach(m4);
-  s5.attach(m5);
-  s6.attach(m6);
-  s7.attach(m7);
-  s8.attach(m8);
-  s9.attach(m9);
 
   //buzzer
   pinMode(buzzer, OUTPUT);
@@ -74,23 +63,18 @@ void setup() {
  * Input: Input coming from button, either 1 or 0
  * Logic: If button is pressed buzzer beeps for 
  *        2seconds two time with interval of 1second with frequency of 3000Hz
- * Example Call: buzz_start(arr[PIN])
+ * Example Call: buzz_start()
  */
-void buzz_start(int button)
+void buzz_start()
 {
- if(button)
- {
   tone(buzzer,3000);
   delay(2000);
   noTone(buzzer);
   delay(1000);
   tone(buzzer,3000);
   delay(2000);
-  }
-  else
-  {
-    noTone(buzzer);
-    }
+  noTone(buzzer);
+  
 }
 
 
@@ -99,12 +83,10 @@ void buzz_start(int button)
  * Input: Input coming from button, either 1 or 0
  * Logic: If button is pressed buzzer beeps for 
  *        1seconds five time with interval of 1second with frequency of 3000Hz
- * Example Call: buzz_END(arr[PIN])
+ * Example Call: buzz_end()
  */
-void buzz_end(int button)
-{
- if(button)
- {int c=0;
+void buzz_end()
+{   int c=0;
     while(c<5)
       {
       tone(buzzer,3000);
@@ -113,11 +95,7 @@ void buzz_end(int button)
       delay(1000);
       c++;
       }
-  }
-  else
-  {
-    noTone(buzzer);
-  }
+  
 }
 
 
@@ -126,16 +104,21 @@ void buzz_end(int button)
  * Input: Input coming from button,value is either 1 or 0
  * Logic: If button is pressed buzzer beeps for 
  *        1/2 seconds 2 time with interval of 1second with frequency of 3000Hz
- * Example Call: detection_buzzer(arr[PIN])
+ * Example Call: detection_buzzer()
  */
 void detection_buzzer()
 {
-  tone(buzzer,3000);
-  delay(500);
-  noTone(buzzer);
-  delay(1000);
-  tone(buzzer,3000);
-  delay(500);
+   if(flag == 0)
+   {
+    tone(buzzer,3000);
+    delay(500);
+    noTone(buzzer);
+    delay(1000);
+    tone(buzzer,3000);
+    delay(500);
+    noTone(buzzer);
+   }
+   flag =flag+1;
   }
 
 //================attach detach motor functions===============
@@ -267,28 +250,39 @@ void snake_straight() {
 
 /*
  * Function Name: catterpillar_turn()
- * Input: value of joystick x1
+ * Input: value of joystick x2
  * Output: None
  * Logic: Due to weight at the end because of battery, whereever we turn it, snake turns in same direction 
  * Example Call: catterpillar_turn(val_joystick)
  */
-void catterpillar_turn(int x1)
+void catterpillar_turn(int x2)
 {
-   if(x1>=87 && x1<=94)
+  int angle;
+   if(x2>=87 && x2<=94)
    {
     s2.detach();
     s4.detach();
     s6.detach();
     s8.detach();
     }
-    else
+    else if(x2>94)
     {
       attach_x1_motor();
-      x1 = (x1*0.5)+45;
-      s2.write(x1);
-      s4.write(x1);
-      s6.write(x1);
-      s8.write(180-x1 + s8_err);
+      angle = map(x2,94,180,5,40);
+      s2.write(90+angle);
+      s4.write(90+angle+5);
+      s6.write(90-(angle+5));
+      s8.write(90+(angle+10)+s8_err);
+    }
+
+    else if(x2<87)
+    {
+      attach_x1_motor();
+      angle = map(x2,87,0,5,40);
+      s2.write(90-angle);
+      s4.write(90-(angle+5));
+      s6.write(90+angle+5);
+      s8.write(90-(angle+10)-s8_err);
     }
 }
 
@@ -313,7 +307,7 @@ void catterpillar_forward(int y1)
     {
       detach_y1_motor();
     }
-    else
+    else if(y1>94)
     {
         attach_y1_motor();
         s9.write(90);
@@ -355,6 +349,66 @@ void catterpillar_forward(int y1)
         //s9.write(110);
       
     }   
+
+    else if(y1<87)
+    {
+      attach_y1_motor();
+        s9.write(90-23-15-23-10);
+        s7.write(90-23-15-15);
+        s1.write(110);
+        s5.write(90-23-15);
+        s3.write(90-23-20);
+      delay(700);
+
+      s7.write(90-23-23-15);
+      s9.write(90-23-15);
+
+      s5.write(90);
+      s3.write(90);
+      delay(300);
+
+      s9.write(90);
+      s7.write(90-23-15);
+
+      s5.write(90-23);
+      s3.write(90-23);
+      delay(400);
+
+      float k =0;
+      for(int i=90-23; i<=90; i++)
+      {
+      s5.write(i);
+      s3.write(i);
+      delay(k);
+      k=k+0.5;
+      }
+      k = 0;
+      for(int i=90-23-23-15; i<=90; i++)
+      {
+        s7.write(i);
+        delay(k);
+        k = k+0.5;
+        }
+      s1.write(90);
+      delay(20);
+     /* s7.write(90-15);
+      s9.write(90);
+      delay(400);
+
+      s7.write(90);
+      s9.write(90);
+      delay(300);*/
+      
+      /*s7.write(90-23-23-15);
+      s9.write(90-23);
+      delay(300);
+
+      s7.write(90);
+      s9.write(90);
+      delay(300);*/
+      
+      
+      }
 }
 
 
@@ -365,68 +419,112 @@ void catterpillar_forward(int y1)
  * Logic: Operates both forward and side motion simultaneously
  * Example Call: catterpillar(x1,y1,z1)
  */
-void catterpillar(int x1, int y1, int z1)
+void catterpillar(int x2, int y1, int z1)
 {
     catterpillar_forward(y1);
-    catterpillar_turn(x1);
+    catterpillar_turn(x2);
     
 }
 
 //======================CatterPillar Gait Ends===============
 
-//======================Gait2: Side Winding==================
+//======================Gait2: Rotate About Center==================
 /*
  * Function Name: sidewinding(x1)
  * Input: Value of joysticks
  * Output: None
  * Logic: Sidewinds the Snake
- * Example Call: Use sidewinding(x1) to sidewind
+ * Example Call: Use turncenter(x1) to sidewind
  */
-void sidewinding(int x1)
+void turncenter(int x1)
 {
     if(x1>=87 && x1<=94)
     {
-      detach_x1_motor();
+      detach_motor();
     }
-    else
-    { 
-
-      if(x1>=94)
-      
-        { //snake_straight();
+    else if(x1<87)
+    {     attach_motor();  
+          s3.write(90-20);
+           s1.write(90);
+           //s5.write(90+20);
+          s9.write(90);
+          s7.write(90-20);
+          delay(600);
+           
+           /*s7.write(90-10);
+           s9.write(90);
+           s5.write(90+20);
+           s3.write(90);
+           s1.write(90);
+           delay(300);*/
           
-          attach_x1_motor();
-          /*s2.write(90+25);
-          s4.write(90-25);
-          s6.write(90-25);
-          s8.write(90+25);
-          delay(300);*/
-           if(x1>=94)
-           {
-            s5.attach(m5);
-            s5.write(90+30);
-            delay(200);
-            s5.write(90+30);
-            s2.write(90+25);
-            s4.write(90+25);
-            s6.write(90+25);
-            s8.write(90-25+ s8_err);
-            delay(300);
-
-            s5.write(90-30);
-            delay(200);
-            s5.write(90-30);
-            s2.write(90-25);
-            s4.write(90-25);
-            s6.write(90-25);
-            s8.write(90+25+ s8_err);
-            delay(300);
-            }
+           s4.write(90-30);
+           //s5.write(90+20);
+           s3.write(90-20);
+           s1.write(90); 
+           s7.write(90-20);
+           s9.write(90);
+           s8.write(90+50);
+           //s2.write(90);
+           delay(600);
            
+           s7.write(90);
+           s9.write(90);
+           //s5.write(90);
+           s3.write(90);
+           s1.write(90);
+           s4.write(90-30);
+           s8.write(90+50);
+           delay(600);
+          
+           s4.write(90);
            
+           s8.write(90);
+           
+           delay(500);
            }
-        
-    } 
+
+     else if(x1>94)
+      {
+        attach_motor();  
+          s3.write(90-20);
+           s1.write(90);
+           //s5.write(90+20);
+          s9.write(90);
+          s7.write(90-20);
+          delay(600);
+           
+           /*s7.write(90-10);
+           s9.write(90);
+           s5.write(90+20);
+           s3.write(90);
+           s1.write(90);
+           delay(300);*/
+          
+           s4.write(90+30);
+           //s5.write(90+20);
+           s3.write(90-20);
+           s1.write(90); 
+           s7.write(90-20);
+           s9.write(90);
+           s8.write(90-50);
+           //s2.write(90);
+           delay(600);
+           
+           s7.write(90);
+           s9.write(90);
+           //s5.write(90);
+           s3.write(90);
+           s1.write(90);
+           s4.write(90+30);
+           s8.write(90-50);
+           delay(600);
+          
+           s4.write(90);
+           s8.write(90);
+           delay(500);
+        }
+     
 }
 
 //======================Gait3: Side Winding Gait Ends============
@@ -442,19 +540,27 @@ void loop() {
   Serial.println("===========================================");
   //delay(1000);  //to see vals uncomment
 
-  /*if(arr[13])
+  if(arr[13])
   {
     detection_buzzer();
     }
+    else
+    {
+      flag = 0;
+      }
 
-  buzz_start(arr[4]); //press 4th button to start buzzer
-  buzz_end(arr[6]); */  //press 6th button to start buzzer
+  if(arr[4])
+  {
+  buzz_start();}   //press 4th button to start buzzer
+
+  if(arr[6])
+  {buzz_end();}  //press 6th button to start buzzer
   
   x1 = arr[7];    
   y1 = arr[8];
   z1 = arr[9];
-  /*x2 = arr[10];
-  y2 = arr[11];
+  x2 = arr[10];
+  /*y2 = arr[11];
   z2 = arr[12];*/
        
     if(arr[5]==1  && arr[0]==0)
@@ -465,10 +571,9 @@ void loop() {
         snake_straight();
         }
         else
-        {catterpillar(x1,y1,z1);
+        {catterpillar(x2,y1,z1);
           }
        
-       //catterpillar(x1,y1,z1);
        }
     if(arr[0]==1 && arr[5]==0)
       {
@@ -478,7 +583,7 @@ void loop() {
         snake_straight();
         } 
        else
-       {sidewinding(x1);}
+       {turncenter(x1);}
        
        
       }
