@@ -140,6 +140,11 @@ else if(val_blue < val_green && val_blue < val_red)
   }
 
 
+
+/*
+ * Using this loop to recieve the values of Joystick from Remote through NRF 
+ * and transfering it Recieve_Snake_Arduino using I2C.
+ */
 void loop() {
   if (radio.available()) 
   {

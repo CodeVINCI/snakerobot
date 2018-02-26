@@ -47,6 +47,10 @@ void setup() {
     }
 }
 
+
+/*
+ * Loop reading Value of respective JoySticks
+ */
 void loop() {
 
   int send_arr[13];

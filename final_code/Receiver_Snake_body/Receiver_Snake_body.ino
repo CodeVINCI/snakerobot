@@ -5,6 +5,8 @@
  * Theme: Spotter Snake
  * Functions: setup(), buzz_start(), buzz_end(), attach_motor(), detach_motor(), 
  *            detach_y1_motor(), attach_y1_motor(), detach_x1_motor(), attach_x1_motor(), detection_buzzer()
+ *            Functions for Gaits:
+ *            
  * Global Variables: x1,x2,y1,y2,z1,z2(values of jouysticks)
  *                   s1,s2,s3,s4,s5,s6,s7,s8,s9(servo motors)
  *                   m1,m2,m3,m4,m5,m6,m7,m8,m9(digital pins of motors)
@@ -245,27 +247,58 @@ void snake_straight() {
   s9.write(90);  
 }
 
+//============================================Gaits===========================================
+
+
 //==================Gait 1: CatterPillar Motion==================
 
+/*
+ * Function Name: catterpillar_turn_tail()
+ * Input: Horizontal value of JoyStick 1 
+ * Output: None
+ * Logic: Since Tail of Snake is heavy, so we turn it and use it to propell it in a particular direction.
+ * Example Call: One can use it calling, catterpillar_turn_tail(Joystick_value)
+ */
 void catterpillar_turn_tail(int x1)
 {
 int angle;
     if(x1<87)
     {
       attach_x1_motor();
+      //s7.attach(m7);
       angle = map(x1,87,0,0,45);
-      s6.write(90);
-      s4.write(90);
-      s8.write(90+angle+s8_err);
+      
+          s6.write(90);
+          s4.write(90);
+          s8.write(90+angle+s8_err);
+          //s7.write(90-20);
+        
       
     }
     else if(x1>94)
     {
       attach_x1_motor();
+      //s7.attach(m7);
       angle = map(x1,94,180,0,45);
-      s6.write(90);
-      s4.write(90);
-      s8.write(90-angle+s8_err);
+          s6.write(90);
+          s4.write(90);
+          s8.write(90-angle+s8_err);
+          //s7.write(90-20);
+      /*s7.write(90-20);
+      delay(300);
+      float c=0;
+      for(int an=0;an<=angle;an++)
+        {
+          s6.write(90);
+          s4.write(90);
+          s8.write(90-an+s8_err);
+          s7.write(90-20);
+          c=c+0.5;
+          delay(c);
+        }
+
+      s7.write(90);
+      delay(200);  */    
       }
   
   }
@@ -275,7 +308,7 @@ int angle;
  * Function Name: catterpillar_turn()
  * Input: value of joystick x2
  * Output: None
- * Logic: Due to weight at the end because of battery, whereever we turn it, snake turns in same direction 
+ * Logic: Due to weight at the end because of battery, where ever we turn it, snake turns in same direction, different from above func. all the horizontal servo moves
  * Example Call: catterpillar_turn(val_joystick)
  */
 void catterpillar_turn(int x2)
@@ -318,7 +351,13 @@ void catterpillar_turn(int x2)
     }
 }
 
-
+/*
+ * Function Name: boost_mode()
+ * Input: value of joystick y1
+ * Output: None
+ * Logic: Just Increased the Amplitudes of CatterPillar Motion, so as to cross the Ramps and Hurdles.
+ * Example Call: boost_mode(val_joystick)
+ */
 void boost_mode(int y1)
 {
   int angle1 = (y1*0.5)+45;
@@ -370,7 +409,6 @@ void boost_mode(int y1)
         snake_straight();
         delay(50);
         //s9.write(110);
-      
     }   
 
     else if(y1<87)
@@ -562,7 +600,7 @@ void catterpillar_forward(int y1)
 
 /*
  * Function Name: catterpillar()
- * Input: value of joystick x1,y1 and z1
+ * Input: value of joystick x1,y1 and z1 and x2
  * Output: None
  * Logic: Operates both forward and side motion simultaneously
  * Example Call: catterpillar(x1,y1,z1)
@@ -577,13 +615,13 @@ void catterpillar(int x2,int x1, int y1, int z1)
 
 //======================CatterPillar Gait Ends===============
 
-//======================Gait2: Rotate About Center==================
+//======================Gait2: Rotating Gait==================
 /*
- * Function Name: sidewinding(x1)
+ * Function Name: turncenter(x1)
  * Input: Value of joysticks
  * Output: None
- * Logic: Sidewinds the Snake
- * Example Call: Use turncenter(x1) to sidewind
+ * Logic: Rotates the snake about center
+ * Example Call: turncenter(joystick_val)
  */
 void turncenter(int x2)
 {
@@ -656,6 +694,13 @@ void turncenter(int x2)
      
 }
 
+/*
+ * Function Name: shrink_turncenter(x1)
+ * Input: Value of joysticks
+ * Output: None
+ * Logic: Rotates the snake about center, but this time robot shrinks so in small spaces this can be used to change directions
+ * Example Call: shrink_turncenter(joystick_val)
+ */
 void shrink_turncenter(int x1)
 {   
   if(x1>=87 && x1<=94)
@@ -758,7 +803,131 @@ void shrink_turncenter(int x1)
   
   }
 
-//======================Gait3: Side Winding Gait Ends============
+//======================Rotating Gait Ends============
+
+//==============================Gait3: Side Winding=========================
+  
+  /*
+ * Function Name: make_s_left(x1)
+ * Input: Value of joysticks
+ * Output: None
+ * Logic: Makes S in left direction
+ * Example Call: make_s_left(joystick_val)
+ */
+  void make_s_left(int x2)
+
+        {
+          if(x2>94)
+          {
+          x2 = (x2*0.5)+45;
+          attach_x1_motor();
+          s2.write(90-x2);
+          s4.write(90-x2);
+          s6.write(90-x2);
+          s8.write(90+s8_err+x2);
+          delay(300);
+          }
+        }
+
+/*
+ * Function Name: make_s_right(x1)
+ * Input: Value of joysticks
+ * Output: None
+ * Logic:Makes S in Right direction
+ * Example Call: make_s_right(joystick_val)
+ */
+  void make_s_right(int x2)
+
+        {
+          if(x2<87)
+          {
+          x2 = (x2*0.5)+45;
+          attach_x1_motor();
+          s2.write(90+x2);
+          s4.write(90+x2);
+          s6.write(90+x2);
+          s8.write(90+s8_err-x2);
+          delay(300);
+          }
+        }
+
+
+ /*
+ * Function Name: wave(x1)
+ * Input: Value of joysticks
+ * Output: None
+ * Logic: Gives wave to sidewind
+ * Example Call: wave(joystick_val)
+ */
+  void wave(int y1)
+  {        
+
+     if(y1>94)
+      {
+        
+          
+        attach_y1_motor();
+        s9.write(90);
+        s7.write(90-23-15);
+        delay(300);
+      
+        s9.write(90-23-23-15-15);
+        delay(400);
+        
+        s9.write(90-23-15);
+        s5.write(90+23+15);
+        s7.write(90+23+15);
+        delay(300);
+      
+        s9.write(90+23+15);
+        s7.write(90+23+23+15+15);
+        s5.write(90+23+15);
+        delay(300);
+      
+        s5.write(90-23-23-15-15);
+        s3.write(90-23-15);
+        s7.write(90-23-15);
+        s9.write(90);
+        delay(300);
+      
+        s7.write(90);
+        s5.write(90+23+15);
+        s3.write(90+23+23+15+15);
+        s1.write(90+23+15);
+        delay(300);
+      
+        s5.write(90+10+10);
+        s3.write(90);
+        s1.write(90);
+        delay(300);
+        
+        snake_straight();
+        delay(50);
+          }
+
+ }
+
+/*
+ * Function Name: sidewind(x1)
+ * Input: Value of joysticks
+ * Output: None
+ * Logic: calls all the above functions
+ * Example Call: sidewind(joystick1_val,joystick2_val)
+ */
+ void sidewind(int y1,int x2)
+ {
+  make_s_left(x2);
+  make_s_right(x2);
+  wave(y1);
+  
+  }
+
+  
+
+
+//==============================Side Winding Ends=========================
+
+
 
 
 void loop() {
@@ -793,7 +962,8 @@ void loop() {
   x2 = arr[10];
   y2 = arr[11];
   z2 = arr[12];
-       
+
+      //2 gaits: Catterpillar and About Center
     if(arr[5]==1  && arr[0]==0)
     {
 
@@ -803,7 +973,7 @@ void loop() {
             }
           else
           {
-            if(z1==0 && z2==1)
+            if(z1==0 && z2==1 && x1>=87 && x1<=94 && y1>=87 && y1<=94)
               {
                 turncenter(x2);
               }
@@ -818,6 +988,8 @@ void loop() {
           }
        
      }
+
+     //1 gait: Boosted Mode
     if(arr[0]==1 && arr[5]==0)
       {
 
@@ -828,6 +1000,21 @@ void loop() {
        boost_mode(y1);
        
       }
+
+
+      //1 gait: SideWinding
+      if(arr[0]==1 && arr[5]==1)
+      {
+
+        if(arr[1]==1)
+       {
+        snake_straight();
+        }
+        
+          sidewind(y1,x2);
+        }
+
+      
   
 }
 
