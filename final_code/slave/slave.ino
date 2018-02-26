@@ -247,6 +247,29 @@ void snake_straight() {
 
 //==================Gait 1: CatterPillar Motion==================
 
+void catterpillar_turn_tail(int x1)
+{
+int angle;
+    if(x1<87)
+    {
+      attach_x1_motor();
+      angle = map(x1,87,0,0,45);
+      s6.write(90);
+      s4.write(90);
+      s8.write(90+angle+s8_err);
+      
+    }
+    else if(x1>94)
+    {
+      attach_x1_motor();
+      angle = map(x1,94,180,0,45);
+      s6.write(90);
+      s4.write(90);
+      s8.write(90-angle+s8_err);
+      }
+  
+  }
+
 
 /*
  * Function Name: catterpillar_turn()
@@ -269,23 +292,148 @@ void catterpillar_turn(int x2)
     {
       attach_x1_motor();
       angle = map(x2,94,180,5,40);
-      s2.write(90+angle);
-      s4.write(90+angle+5);
-      s6.write(90-(angle+5));
-      s8.write(90+(angle+10)+s8_err);
+      for(int i=0;i<angle;i++)
+      {
+      s2.write(90+i+5);
+      s4.write(90+i+5);
+      s6.write(90-(i+5));
+      s8.write(90+(i+5)+s8_err);
+      delay(1);
+      }
     }
 
     else if(x2<87)
     {
+      
       attach_x1_motor();
       angle = map(x2,87,0,5,40);
-      s2.write(90-angle);
-      s4.write(90-(angle+5));
-      s6.write(90+angle+5);
-      s8.write(90-(angle+10)-s8_err);
+      for(int i=0;i<angle;i++)
+      {
+      s2.write(90-i+5);
+      s4.write(90-(i+5));
+      s6.write(90+i+5);
+      s8.write(90-(i+5)-s8_err);
+      delay(1);
+      }
     }
 }
 
+
+void boost_mode(int y1)
+{
+  int angle1 = (y1*0.5)+45;
+  int angle2 = 180-angle1;
+
+  float angle_addition;
+
+  if(y1>=87 && y1<=94)
+    {
+      detach_y1_motor();
+    }
+   else if(y1>94)
+    {
+        attach_y1_motor();
+        s9.write(90);
+        s7.write(90-23-15-10);
+        delay(300);
+      
+        s9.write(90-23-23-15-15);//
+        delay(400);
+        
+        s9.write(90-23-15-10);
+        s5.write(90+23+15+10);
+        s7.write(90+23+15+10);
+        delay(300);
+      
+        s9.write(90+23+15+10);
+        s7.write(90+23+23+15+15+10);
+        s5.write(90+23+15+10);
+        delay(300);
+      
+        s5.write(90-23-23-15-15-10);
+        s3.write(90-23-15-10);
+        s7.write(90-23-15-10);
+        s9.write(90);
+        delay(300);
+      
+        s7.write(90);
+        s5.write(90+23+15+10);
+        s3.write(90+23+23+15+15+10);
+        s1.write(90+23+15+10);
+        delay(300);
+      
+        s5.write(90+10+10+10);
+        s3.write(90);
+        s1.write(90);
+        delay(300);
+        
+        snake_straight();
+        delay(50);
+        //s9.write(110);
+      
+    }   
+
+    else if(y1<87)
+    {
+      attach_y1_motor();
+        s9.write(90-23-15-23-10);
+        s7.write(90-23-15-15);
+        s1.write(110);
+        s5.write(90-23-15);
+        s3.write(90-23-20);
+      delay(700);
+
+      s7.write(90-23-23-15);
+      s9.write(90-23-15);
+
+      s5.write(90);
+      s3.write(90);
+      delay(300);
+
+      s9.write(90);
+      s7.write(90-23-15);
+
+      s5.write(90-23);
+      s3.write(90-23);
+      delay(400);
+
+      float k =0;
+      for(int i=90-23; i<=90; i++)
+      {
+      s5.write(i);
+      s3.write(i);
+      delay(k);
+      k=k+0.5;
+      }
+      k = 0;
+      for(int i=90-23-23-15; i<=90; i++)
+      {
+        s7.write(i);
+        delay(k);
+        k = k+0.5;
+        }
+      s1.write(90);
+      delay(20);
+     /* s7.write(90-15);
+      s9.write(90);
+      delay(400);
+
+      s7.write(90);
+      s9.write(90);
+      delay(300);*/
+      
+      /*s7.write(90-23-23-15);
+      s9.write(90-23);
+      delay(300);
+
+      s7.write(90);
+      s9.write(90);
+      delay(300);*/
+      
+      
+      }
+    
+}
 
 /*
  * Function Name: catterpillar_forward()
@@ -419,10 +567,11 @@ void catterpillar_forward(int y1)
  * Logic: Operates both forward and side motion simultaneously
  * Example Call: catterpillar(x1,y1,z1)
  */
-void catterpillar(int x2, int y1, int z1)
+void catterpillar(int x2,int x1, int y1, int z1)
 {
     catterpillar_forward(y1);
     catterpillar_turn(x2);
+    catterpillar_turn_tail(x1);
     
 }
 
@@ -436,27 +585,21 @@ void catterpillar(int x2, int y1, int z1)
  * Logic: Sidewinds the Snake
  * Example Call: Use turncenter(x1) to sidewind
  */
-void turncenter(int x1)
+void turncenter(int x2)
 {
-    if(x1>=87 && x1<=94)
+    if(x2>=87 && x2<=94)
     {
       detach_motor();
     }
-    else if(x1<87)
-    {     attach_motor();  
+    else if(x2<87)
+    {     attach_motor();
+           snake_straight();
+           delay(300);  
           s3.write(90-20);
            s1.write(90);
-           //s5.write(90+20);
           s9.write(90);
           s7.write(90-20);
           delay(600);
-           
-           /*s7.write(90-10);
-           s9.write(90);
-           s5.write(90+20);
-           s3.write(90);
-           s1.write(90);
-           delay(300);*/
           
            s4.write(90-30);
            //s5.write(90+20);
@@ -476,30 +619,19 @@ void turncenter(int x1)
            s4.write(90-30);
            s8.write(90+50);
            delay(600);
-          
-           s4.write(90);
-           
-           s8.write(90);
-           
-           delay(500);
+           snake_straight();
            }
 
-     else if(x1>94)
+     else
       {
         attach_motor();  
+        snake_straight();
+        delay(300);
           s3.write(90-20);
            s1.write(90);
-           //s5.write(90+20);
           s9.write(90);
           s7.write(90-20);
           delay(600);
-           
-           /*s7.write(90-10);
-           s9.write(90);
-           s5.write(90+20);
-           s3.write(90);
-           s1.write(90);
-           delay(300);*/
           
            s4.write(90+30);
            //s5.write(90+20);
@@ -519,13 +651,112 @@ void turncenter(int x1)
            s4.write(90+30);
            s8.write(90-50);
            delay(600);
-          
-           s4.write(90);
-           s8.write(90);
-           delay(500);
+           snake_straight();
         }
      
 }
+
+void shrink_turncenter(int x1)
+{   
+  if(x1>=87 && x1<=94)
+    {
+      detach_motor();
+    }
+
+    else if(x1<87)
+    {
+      attach_motor();
+   s3.write(170);
+   s1.write(170);
+   s5.write(130);
+    s9.write(20);
+    s7.write(55);
+    delay(800);
+   
+   s7.write(55-10);
+   s9.write(20);
+   s5.write(130+20);
+   s3.write(170);
+   s1.write(170);
+   delay(500);
+  
+   s4.write(90-25);
+   s5.write(130+20);
+   s3.write(170);
+   s1.write(170); 
+   s7.write(55-10);
+   s9.write(20);
+   s8.write(90+15);
+   s6.write(90-15);
+   s2.write(90-25);
+   delay(500);
+   
+   s7.write(55);
+   s9.write(20);
+   s5.write(130);
+   s3.write(170);
+   s1.write(170);
+   delay(500);
+  
+   s4.write(90);
+   s2.write(90);
+   s8.write(90);
+   s6.write(90);
+   s3.write(170);
+   s1.write(170);
+   s5.write(130);
+   s9.write(20);
+   s7.write(55);
+   delay(500);
+   }
+
+   else
+    {
+      attach_motor();
+      s3.write(170);
+     s1.write(170);
+     s5.write(130);
+    s9.write(20);
+    s7.write(55);
+    delay(800);
+   
+   s7.write(55-10);
+   s9.write(20);
+   s5.write(130+20);
+   s3.write(170);
+   s1.write(170);
+   delay(500);
+  
+   s4.write(90+25);
+   s5.write(130+20);
+   s3.write(170);
+   s1.write(170); 
+   s7.write(55-10);
+   s9.write(20);
+   s6.write(90+30);
+   s2.write(90+25);
+   delay(500);
+   
+   s7.write(55);
+   s9.write(20);
+   s5.write(130);
+   s3.write(170);
+   s1.write(170);
+   delay(500);
+  
+   s4.write(90);
+   s2.write(90);
+   s6.write(90);
+   s3.write(170);
+   s1.write(170);
+   s5.write(130);
+   s9.write(20);
+   s7.write(55);
+   delay(500);
+      
+      }
+  
+  }
 
 //======================Gait3: Side Winding Gait Ends============
 
@@ -560,21 +791,33 @@ void loop() {
   y1 = arr[8];
   z1 = arr[9];
   x2 = arr[10];
-  /*y2 = arr[11];
-  z2 = arr[12];*/
+  y2 = arr[11];
+  z2 = arr[12];
        
     if(arr[5]==1  && arr[0]==0)
     {
 
-      if(arr[1]==1)
-       {
-        snake_straight();
-        }
-        else
-        {catterpillar(x2,y1,z1);
+          if(arr[1]==1)
+           {
+            snake_straight();
+            }
+          else
+          {
+            if(z1==0 && z2==1)
+              {
+                turncenter(x2);
+              }
+            else if(z2==0 && z1==1)
+              {
+                shrink_turncenter(x1);
+                }
+            else if(z2==1 && z1==1)
+              {
+                catterpillar(x2,x1,y1,z1);
+              }
           }
        
-       }
+     }
     if(arr[0]==1 && arr[5]==0)
       {
 
@@ -582,9 +825,7 @@ void loop() {
        {
         snake_straight();
         } 
-       else
-       {turncenter(x1);}
-       
+       boost_mode(y1);
        
       }
   
